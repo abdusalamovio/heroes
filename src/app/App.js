@@ -1,8 +1,8 @@
 import "./App.scss";
 
-import HeroesList from "../heroesList/HeroesList";
-import HeroesAddForm from "../heroesAddForm/HeroesAddForm";
-import HeroesFilters from "../heroesFilters/HeroesFilters";
+import HeroesList from "../components/heroesList/HeroesList";
+import HeroesAddForm from "../components/heroesAddForm/HeroesAddForm";
+import HeroesFilters from "../components/heroesFilters/HeroesFilters";
 
 const App = () => {
   return (
