@@ -13,7 +13,8 @@ import HeroesListItem from "../heroesListItem/HeroesListItem";
 import Spinner from "../spinner/Spinner";
 
 const HeroesList = () => {
-  const { filteredHeroes, heroesLoadingStatus } = useSelector((state) => state);
+  const filteredHeroes = useSelector((state) => state.filteredHeroes);
+  const heroesLoadingStatus = useSelector((state) => state.heroesLoadingStatus);
   const dispatch = useDispatch();
   const { request } = useHttp();
 
