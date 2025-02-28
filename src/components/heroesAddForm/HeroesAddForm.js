@@ -1,13 +1,18 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useHttp } from "../../hooks/http.hook";
 import { heroCreated } from "../../actions";
-import { v4 as uuid } from "uuid";
+import { v4 as uuidv } from "uuid";
 
 const HeroesAddForm = () => {
   const [heroName, setHeroName] = useState("");
   const [heroDescr, setHeroDescr] = useState("");
-  // const [heroElement, setHeroElement] = useState("");
+  const [heroElement, setHeroElement] = useState("");
+
+  const filters = useSelector((state) => state.filters);
+  const filtersLoadingStatus = useSelector(
+    (state) => state.filtersLoadingStatus
+  );
   const dispatch = useDispatch();
   const { request } = useHttp();
 
@@ -15,22 +20,43 @@ const HeroesAddForm = () => {
     e.preventDefault();
 
     const newHero = {
-      id: uuid(),
+      id: uuidv(),
       name: heroName,
       description: heroDescr,
-      // element: heroElement,
+      element: heroElement,
     };
 
     request("http://localhost:3001/heroes", "POST", JSON.stringify(newHero))
-      .catch((error) => console.log(error))
-      .then(dispatch(heroCreated(newHero)));
+      .then(dispatch(heroCreated(newHero)))
+      .catch((err) => console.log(err));
 
     setHeroName("");
     setHeroDescr("");
+    setHeroElement("");
+  };
+
+  const renderFilters = (filters, status) => {
+    if (status === "loading") {
+      return <option>Загрузка элементов</option>;
+    } else if (status === "error") {
+      return <option>Ошибка загрузки</option>;
+    }
+
+    if (filters && filters.length > 0) {
+      return filters.map(({ name, label }) => {
+        // eslint-disable-next-line
+        if (name === "all") return;
+        return (
+          <option key={name} value={name}>
+            {label}
+          </option>
+        );
+      });
+    }
   };
 
   return (
-    <form onSubmit={onSubmit} className="border p-4 shadow-lg rounded">
+    <form className="border p-4 shadow-lg rounded" onSubmit={onSubmit}>
       <div className="mb-3">
         <label htmlFor="name" className="form-label fs-4">
           Имя нового героя
@@ -58,28 +84,29 @@ const HeroesAddForm = () => {
           className="form-control"
           style={{ height: "130px" }}
           name="text"
-          required
           placeholder="Что я умею?"
+          required
         />
       </div>
 
-      {/* <div className="mb-3">
+      <div className="mb-3">
         <label htmlFor="element" className="form-label">
           Выбрать элемент героя
         </label>
         <select
-          required
-          className="form-select"
-          id="element"
-          name="element"
-          value={heroElement}
           onChange={(e) => setHeroElement(e.target.value)}
+          value={heroElement}
+          id="element"
+          className="form-select"
+          name="element"
+          required
         >
           <option value="">Я владею элементом...</option>
+          {renderFilters(filters, filtersLoadingStatus)}
         </select>
-      </div> */}
+      </div>
 
-      <button type="submit" className="btn btn-primary">
+      <button className="btn btn-primary" type="submit">
         Создать
       </button>
     </form>
