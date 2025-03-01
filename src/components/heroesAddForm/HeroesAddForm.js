@@ -9,27 +9,24 @@ const HeroesAddForm = () => {
   const [heroDescr, setHeroDescr] = useState("");
   const [heroElement, setHeroElement] = useState("");
 
-  const filters = useSelector((state) => state.filters);
+  const filters = useSelector((state) => state.filters.filters);
   const filtersLoadingStatus = useSelector(
-    (state) => state.filtersLoadingStatus
+    (state) => state.filters.filtersLoadingStatus
   );
   const dispatch = useDispatch();
   const { request } = useHttp();
 
   const onSubmit = (e) => {
     e.preventDefault();
-
     const newHero = {
       id: uuidv(),
       name: heroName,
       description: heroDescr,
       element: heroElement,
     };
-
     request("http://localhost:3001/heroes", "POST", JSON.stringify(newHero))
       .then(dispatch(heroCreated(newHero)))
       .catch((err) => console.log(err));
-
     setHeroName("");
     setHeroDescr("");
     setHeroElement("");
