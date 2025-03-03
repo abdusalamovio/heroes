@@ -3,20 +3,15 @@ import { useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHttp } from "../../hooks/http.hook";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
-import { createSelector } from "@reduxjs/toolkit";
-import { fetchHeroes, heroDeleted } from "./heroesSlice";
+import {
+  fetchHeroes,
+  filteredHeroesSelector,
+  heroDeleted,
+} from "./heroesSlice";
 import HeroesListItem from "../heroesListItem/HeroesListItem";
 import Spinner from "../spinner/Spinner";
 
 const HeroesList = () => {
-  const filteredHeroesSelector = createSelector(
-    (state) => state.filters.activeFilter,
-    (state) => state.heroes.heroes,
-    (filter, heroes) => {
-      if (filter === "all") return heroes;
-      return heroes.filter((item) => item.element === filter);
-    }
-  );
   const filteredHeroes = useSelector(filteredHeroesSelector);
   const heroesLoadingStatus = useSelector(
     (state) => state.heroes.heroesLoadingStatus
@@ -33,7 +28,7 @@ const HeroesList = () => {
     (id) => {
       request(`http://localhost:3001/heroes/${id}`, "DELETE")
         .then(dispatch(heroDeleted(id)))
-        .catch((err) => console.log(err));
+        .catch((error) => console.log(error));
     },
     // eslint-disable-next-line
     [request]
