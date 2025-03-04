@@ -1,42 +1,36 @@
 import "./heroesList.scss";
-import { useEffect, useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useHttp } from "../../hooks/http.hook";
+import { useCallback, useMemo } from "react";
+import { useSelector } from "react-redux";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
-import {
-  fetchHeroes,
-  filteredHeroesSelector,
-  heroDeleted,
-} from "./heroesSlice";
+import { useGetHeroesQuery, useDeleteHeroMutation } from "../../api/apiSlice";
 import HeroesListItem from "../heroesListItem/HeroesListItem";
 import Spinner from "../spinner/Spinner";
 
 const HeroesList = () => {
-  const filteredHeroes = useSelector(filteredHeroesSelector);
-  const heroesLoadingStatus = useSelector(
-    (state) => state.heroes.heroesLoadingStatus
-  );
-  const dispatch = useDispatch();
-  const { request } = useHttp();
+  const { data: heroes = [], isLoading, isError } = useGetHeroesQuery();
+  const [deleteHero] = useDeleteHeroMutation();
 
-  useEffect(() => {
-    dispatch(fetchHeroes());
-    // eslint-disable-next-line
-  }, []);
+  const activeFilter = useSelector((state) => state.filters.activeFilter);
+  const filteredHeroes = useMemo(() => {
+    const filteredHeroes = heroes.slice();
+    if (activeFilter === "all") {
+      return filteredHeroes;
+    } else {
+      return filteredHeroes.filter((item) => item.element === activeFilter);
+    }
+  }, [heroes, activeFilter]);
 
   const onDelete = useCallback(
     (id) => {
-      request(`http://localhost:3001/heroes/${id}`, "DELETE")
-        .then(dispatch(heroDeleted(id)))
-        .catch((error) => console.log(error));
+      deleteHero(id);
     },
     // eslint-disable-next-line
-    [request]
+    []
   );
 
-  if (heroesLoadingStatus === "loading") {
+  if (isLoading) {
     return <Spinner />;
-  } else if (heroesLoadingStatus === "error") {
+  } else if (isError) {
     return <h5 className="text-center mt-5">Ошибка загрузки</h5>;
   }
 

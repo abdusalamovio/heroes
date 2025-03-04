@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { fetchFilters, selectAll, filtersChanged } from "./filtersSlice";
 import Spinner from "../spinner/Spinner";
 
